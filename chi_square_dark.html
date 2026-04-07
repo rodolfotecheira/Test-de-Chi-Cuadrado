@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Chi-Cuadrado</title>
+  <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+  <style>
+    body { font-family: Arial; margin: 40px; background-color: #121212; color: #ffffff; }
+    input { width: 60px; text-align: center; background-color: #1e1e1e; color: white; border: 1px solid #555; }
+    table { border-collapse: collapse; margin-bottom: 20px; }
+    td, th { border: 1px solid #555; padding: 5px; }
+    button { padding: 10px; background-color: #333; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #555; }
+    select { background-color: #1e1e1e; color: white; border: 1px solid #555; }
+  </style>
+</head>
+<body>
+
+<h2>Test de Chi-Cuadrado</h2>
+
+<p>Ingresá los valores de tu tabla 2x2:</p>
+
+<table>
+  <tr>
+    <th></th>
+    <th>Columna 1</th>
+    <th>Columna 2</th>
+  </tr>
+  <tr>
+    <th>Fila 1</th>
+    <td><input id="a" type="number"></td>
+    <td><input id="b" type="number"></td>
+  </tr>
+  <tr>
+    <th>Fila 2</th>
+    <td><input id="c" type="number"></td>
+    <td><input id="d" type="number"></td>
+  </tr>
+</table>
+
+<p>Elegí nivel de significancia:</p>
+<select id="alpha">
+  <option value="0.05">0.05</option>
+  <option value="0.01">0.01</option>
+</select>
+
+<br><br>
+<button onclick="calcular()">Calcular</button>
+
+<h3>Resultados</h3>
+<p id="resultado"></p>
+
+<script>
+function calcular() {
+  let a = parseFloat(document.getElementById("a").value) || 0;
+  let b = parseFloat(document.getElementById("b").value) || 0;
+  let c = parseFloat(document.getElementById("c").value) || 0;
+  let d = parseFloat(document.getElementById("d").value) || 0;
+
+  let alpha = parseFloat(document.getElementById("alpha").value);
+
+  let total = a + b + c + d;
+
+  let fila1 = a + b;
+  let fila2 = c + d;
+  let col1 = a + c;
+  let col2 = b + d;
+
+  let ea = (fila1 * col1) / total;
+  let eb = (fila1 * col2) / total;
+  let ec = (fila2 * col1) / total;
+  let ed = (fila2 * col2) / total;
+
+  let chi =
+    Math.pow(a - ea, 2) / ea +
+    Math.pow(b - eb, 2) / eb +
+    Math.pow(c - ec, 2) / ec +
+    Math.pow(d - ed, 2) / ed;
+
+  let df = 1;
+
+  let p = 1 - jStat.chisquare.cdf(chi, df);
+
+  let interpretacion = "";
+  if (p < alpha) {
+    interpretacion = "Se rechaza H0: existe asociación entre las variables.";
+  } else {
+    interpretacion = "No se rechaza H0: no hay evidencia de asociación.";
+  }
+
+  document.getElementById("resultado").innerHTML =
+    "Chi² = " + chi.toFixed(4) +
+    "<br>p-valor = " + p.toFixed(4) +
+    "<br><b>" + interpretacion + "</b>";
+}
+</script>
+
+</body>
+</html>
